@@ -155,6 +155,7 @@ insert into item_pesanan values
 (20014,"AH008",4,28700),
 (20015,"JM002",7,33700);
 
+-- Mengubah input kuantitas pada idproduk JB010
 update item_pesanan set kuantitas=5 where idProduk="JB010";
 
 -- Menampilkan nama pelanggan yang memesan barang yang sama
@@ -178,4 +179,20 @@ select produk.namaProduk, format (sum(kuantitas),0) as "banyak barang terjual",
 
 -- Menampilkan urutan paling banyak digunakan tiap jasa shipper
 
+select shipper.namaShipper, count(pesanan.idShipper) as `jumlah pengguna` from pesanan 
+join shipper on shipper.idShipper=pesanan.idShipper
+group by pesanan.idShipper order by `jumlah pengguna` desc;
+
 -- Menambahkan kolom label melebihi stok
+select 
+produk.idProduk,
+produk.namaProduk,
+produk.kuantitas_stok,
+coalesce(sum(item_pesanan.kuantitas), 0) as total_dipesan,
+case 
+	when coalesce(sum(item_pesanan.kuantitas), 0)  > produk.kuantitas_stok then 'Melebihi Stok'
+	else 'Aman'
+end as status_stok
+from produk
+left join item_pesanan on produk.idProduk = item_pesanan.idProduk
+group by produk.idProduk, produk.namaProduk, produk.kuantitas_stok;
