@@ -180,7 +180,7 @@ select produk.namaProduk, sum(item_pesanan.kuantitas) as `banyak barang terjual`
 from item_pesanan join produk on produk.idProduk=item_pesanan.idProduk group by item_pesanan.idProduk;  -- join ini defaultnya inner join
 -- from item_pesanan inner join produk on produk.idProduk=item_pesanan.idProduk group by produk.idProduk;
 -- from produk inner join item_pesanan on produk.idProduk=item_pesanan.idProduk group by item_pesanan.idProduk;  -- inner untuk menampilkan baris yang memiliki nilai yang cocok di kedua tabel
--- from item_pesanan left join produk on produk.idProduk=item_pesanan.idProduk group by produk.idProduk;  -- query ini dapat menghasilkan output yang benar namun harusnya penggunaan left untuk menampilkan semua baris baik yang ada pasangan maupun tidak 
+-- from item_pesanan left join produk on produk.idProduk=item_pesanan.idProduk group by produk.idProduk;  -- query ini dapat menghasilkan output yang benar namun kurang tepat krn penggunaan left untuk menampilkan semua baris baik yang ada pasangan maupun tidak 
 
 -- Menampilkan produk yang belum terjual (tidak ada di item_pesanan)
 select produk.namaProduk, sum(item_pesanan.kuantitas) as `banyak barang terjual`, sum(item_pesanan.total_harga) as `total penjualan (rp)`
