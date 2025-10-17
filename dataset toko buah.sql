@@ -192,7 +192,11 @@ select shipper.namaShipper, count(pesanan.idShipper) as `jumlah pengguna` from p
 join shipper on shipper.idShipper=pesanan.idShipper
 group by pesanan.idShipper order by `jumlah pengguna` desc;
 
--- Menambahkan kolom label melebihi stok
+-- select shipper.namaShipper, count(pesanan.idShipper) as `jumlah pengguna` from shipper -- (query ini juga bisa menampilkan urutan paling banyak digunakan tiap jasa shipper)
+-- join pesanan on shipper.idShipper=pesanan.idShipper
+-- group by shipper.idShipper order by `jumlah pengguna` desc;
+
+-- Menambahkan kolom label status stok
 select 
 produk.idProduk,
 produk.namaProduk,
