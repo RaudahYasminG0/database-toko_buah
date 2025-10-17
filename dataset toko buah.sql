@@ -188,9 +188,9 @@ select
 produk.idProduk,
 produk.namaProduk,
 produk.kuantitas_stok,
-coalesce(sum(item_pesanan.kuantitas), 0) as total_dipesan,
+coalesce(sum(item_pesanan.kuantitas), 0) as total_dipesan,  -- sum(item_pesanan.kuantitas) (akan berisi null untuk produk yg belum terjual)
 case 
-	when coalesce(sum(item_pesanan.kuantitas), 0)  > produk.kuantitas_stok then 'Melebihi Stok'
+	when coalesce(sum(item_pesanan.kuantitas), 0)  > produk.kuantitas_stok then 'Melebihi Stok' -- sum(item_pesanan.kuantitas) (akan berisi null untuk produk yg belum terjual)
 	else 'Aman'
 end as status_stok
 from produk
