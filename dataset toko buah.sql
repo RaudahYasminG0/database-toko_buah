@@ -137,7 +137,7 @@ insert into item_pesanan values
 (20010,"A011",3,39000),
 (20011,"L013",5,31500);
 
--- Menambahkan data pelanggan, pesanan, item_pesanan, dan update kuantitas produk sejumlah 5 pada table item_pesanan untuk pesanan JB010
+-- Menambahkan data pelanggan, pesanan, dan item_pesanan
 insert into pelanggan values
 (10012,"Helena","Wirawan","08652719203","Jalan Pucang Anom","Surabaya",0),
 (10013,"Alex","Thamrin Salam","0892939181327","Jalan Buduran","Sidoarjo",883),
@@ -159,7 +159,6 @@ insert into item_pesanan values
 update item_pesanan set kuantitas=5 where idProduk="JB010";
 
 -- Menampilkan nama pelanggan yang memesan barang yang sama
-
 select pelanggan.nama_depan, pelanggan.nama_belakang, produk.idProduk, produk.namaProduk from pesanan
 join pelanggan on pelanggan.idPelanggan=pesanan.idPelanggan
 join item_pesanan on item_pesanan.idPesanan=pesanan.idPesanan
@@ -167,18 +166,26 @@ join produk on produk.idProduk=item_pesanan.idProduk
 where produk.idProduk in 
 (select item_pesanan.idProduk from item_pesanan group by item_pesanan.idProduk having count(item_pesanan.idProduk) > 1);
 
--- Menambahkan kolom total harga pada item_pesanan
-
+-- Menambahkan kolom total harga pada item_pesanan di mana total harga adalah kuantitas dikali harga per unit
 alter table item_pesanan add total_harga int not null default 0;
 
 update item_pesanan set total_harga=kuantitas * harga_unit;
 
--- Menampilkan jumlahan barang yang terjual dan jumlahan total harga tiap produk yang terjual
+-- Menampilkan semua nama produk dengan jumlahan barang yang terjual dan jumlahan total penjualan tiap produk
+select produk.namaProduk, sum(item_pesanan.kuantitas) as `banyak barang terjual`, sum(item_pesanan.total_harga) as `total penjualan (rp)`
+from produk left join item_pesanan on produk.idProduk=item_pesanan.idProduk group by produk.idProduk;
 
-select produk.namaProduk, format (sum(kuantitas),0) as "banyak barang terjual",
+-- Menampilkan nama produk dengan jumlahan barang yang terjual dan jumlahan total penjualan tiap produk yang terjual
+select produk.namaProduk, sum(item_pesanan.kuantitas) as `banyak barang terjual`, sum(item_pesanan.total_harga) as `total penjualan (rp)`
+from item_pesanan join produk on produk.idProduk=item_pesanan.idProduk group by item_pesanan.idProduk;  
+-- (from item_pesanan left join produk on produk.idProduk=item_pesanan.idProduk group by produk.idProduk;)
+
+-- Menampilkan produk yang belum terjual (tidak ada di item_pesanan)
+select produk.namaProduk, sum(item_pesanan.kuantitas) as `banyak barang terjual`, sum(item_pesanan.total_harga) as `total penjualan (rp)`
+from produk left join item_pesanan on produk.idProduk=item_pesanan.idProduk
+where item_pesanan.idProduk is null group by produk.idProduk;
 
 -- Menampilkan urutan paling banyak digunakan tiap jasa shipper
-
 select shipper.namaShipper, count(pesanan.idShipper) as `jumlah pengguna` from pesanan 
 join shipper on shipper.idShipper=pesanan.idShipper
 group by pesanan.idShipper order by `jumlah pengguna` desc;
@@ -188,9 +195,9 @@ select
 produk.idProduk,
 produk.namaProduk,
 produk.kuantitas_stok,
-coalesce(sum(item_pesanan.kuantitas), 0) as total_dipesan,  -- sum(item_pesanan.kuantitas) (akan berisi null untuk produk yg belum terjual)
+coalesce(sum(item_pesanan.kuantitas), 0) as total_dipesan, -- sum(item_pesanan.kuantitas) = produk yang belum terjual akan tertulis null
 case 
-	when coalesce(sum(item_pesanan.kuantitas), 0)  > produk.kuantitas_stok then 'Melebihi Stok' -- sum(item_pesanan.kuantitas) (akan berisi null untuk produk yg belum terjual)
+	when coalesce(sum(item_pesanan.kuantitas), 0) > produk.kuantitas_stok then 'Melebihi Stok' -- sum(item_pesanan.kuantitas) = produk yang belum terjual akan tertulis null
 	else 'Aman'
 end as status_stok
 from produk
